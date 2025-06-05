@@ -1,19 +1,26 @@
+import {Route, Routes} from 'react-router-dom';
+import HomePage from './pages/HomePage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import SignUpPage from './pages/SignUpPage.jsx';
+import TransactionPage from './pages/TranscationPage.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
+import Header from './components/ui/Header.jsx';
 
 function App() {
+
+  const authUser = true;
   return (
     <>
+	 {authUser && <Header />}
       <Routes>
-				{/*<Route path='/' element={data.authUser ? <HomePage /> : <Navigate to='/login' />} />
-				<Route path='/login' element={!data.authUser ? <LoginPage /> : <Navigate to='/' />} />*/}
-				<Route path='/signup' element={!data.authUser ? <SignUpPage /> : <Navigate to='/' />} />
-				{/*<Route
-					path='/transaction/:id'
-					element={data.authUser ? <TransactionPage /> : <Navigate to='/login' />}
-				/>
-				<Route path='*' element={<NotFoundPage />} />*/}
-			</Routes>
+		<Route path='/' element={<HomePage />} />
+		<Route path='/login' element={<LoginPage />} />
+		<Route path='/signup' element={<SignUpPage />} />
+		<Route path='/transaction/:id' element={<TransactionPage />} />
+		<Route path='*' element={<NotFoundPage />} />
+	</Routes>
     </>
-  )
+  );
 }
 
 export default App;
