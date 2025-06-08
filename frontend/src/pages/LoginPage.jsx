@@ -1,12 +1,19 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useMutation } from "@apollo/client";
 import InputField from "../components/InputField";
+import { LOGIN } from "../graphql/mutations/user.mutation.js";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+	const navigate = useNavigate();
 	const [loginData, setLoginData] = useState({
 		username: "",
 		password: "",
 	});
+
+	const [login, { loading }] = useMutation(LOGIN, {refetchQueries: ["GetAuthenticatedUser"]});
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -16,9 +23,20 @@ const LoginPage = () => {
 		}));
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log(loginData);
+		try {
+			await login({
+				variables: {
+					input: loginData,
+				},
+			});
+			toast.success("Login successful!");
+			navigate("/");
+		} catch (error) {
+			console.error("Login error:", error);
+			toast.error(error.message || "Login failed. Please try again.");
+		}
 	};
 
 	return (
@@ -53,23 +71,23 @@ const LoginPage = () => {
 									className='w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black  focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300
 										disabled:opacity-50 disabled:cursor-not-allowed
 									'
+									disabled={loading}
 								>
-									Login
+									{loading ? "Logging in..." : "Login"}
 								</button>
 							</div>
-						</form>
-						<div className='mt-4 text-sm text-gray-600 text-center'>
-							<p>
-								{"Don't"} have an account?{" "}
-								<Link to='/signup' className='text-black hover:underline'>
-									Sign Up
+							<p className="text-center mt-4">
+								Don't have an account?{" "}
+								<Link to="/signup" className="text-blue-600 hover:text-blue-800">
+									Sign up
 								</Link>
 							</p>
-						</div>
+						</form>
 					</div>
 				</div>
 			</div>
 		</div>
 	);
 };
+
 export default LoginPage;

@@ -20,40 +20,37 @@ import { configurePassport } from "./passport/passport.config.js";
 
 dotenv.config();
 configurePassport();
-const app = express();
 
+const app = express();
 const httpServer = http.createServer(app);
 
 const MongoDBStore = connectMongo(session);
 
-const store = new MongoDBStore({
-	uri: process.env.MONGO_URI,
-	collection: "sessions",
-});
-
-store.on("error", (err) => console.log(err));
-
 app.use(
 	session({
-		secret: process.env.SESSION_SECRET,
-		resave: false, // this option specifies whether to save the session to the store on every request
-		saveUninitialized: false, // option specifies whether to save uninitialized sessions
+		secret: process.env.SESSION_SECRET || "your-secret-key",
+		resave: false,
+		saveUninitialized: false,
+		store: new MongoDBStore({
+			uri: process.env.MONGODB_URI || "mongodb://localhost:27017/expense_tracker",
+			collection: "sessions",
+		}),
 		cookie: {
-			maxAge: 1000 * 60 * 60 * 24 * 7,
-			httpOnly: true, // this option prevents the Cross-Site Scripting (XSS) attacks
+			maxAge: 1000 * 60 * 60 * 24, // 1 day
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
 		},
-		store: store,
 	})
 );
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-
-const server = new ApolloServer ({
-typeDefs: mergedTypeDefs,
-resolvers: mergedResolvers,
-plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
+const server = new ApolloServer({
+	typeDefs: mergedTypeDefs,
+	resolvers: mergedResolvers,
+	plugins: [ApolloServerPluginDrainHttpServer({ httpServer })]
 });
 
 // Ensure we wait for our server to start
@@ -68,7 +65,7 @@ app.use(
 	// expressMiddleware accepts the same arguments:
 	// an Apollo Server instance and optional configuration options
 	expressMiddleware(server, {
-		context: async ({req, res}) => ({ req, res }),
+		context: async ({req, res}) => buildContext({ req, res }),
 	})
 );
 
