@@ -1,4 +1,11 @@
+import { useMutation } from "@apollo/client";
+import { CREATE_TRANSACTION } from "../graphql/mutations/transaction.mutation.js";
+import toast from "react-hot-toast";
+
 const TransactionForm = () => {
+	// TODO => WHEN RELATIONSHIPS ARE ADDED, CHANGE THE REFETCH QUERY A BIT
+	const [createTransaction, { loading }] = useMutation(CREATE_TRANSACTION, {refetchQueries: ["GetTransactions"]});
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
@@ -9,10 +16,35 @@ const TransactionForm = () => {
 			paymentType: formData.get("paymentType"),
 			category: formData.get("category"),
 			amount: parseFloat(formData.get("amount")),
-			location: formData.get("location"),
+			location: formData.get("location") || "Unknown",
 			date: formData.get("date"),
 		};
-		console.log("transactionData", transactionData);
+
+		// Validate required fields
+		if (!transactionData.description || !transactionData.paymentType || 
+			!transactionData.category || !transactionData.amount || !transactionData.date) {
+			toast.error("Please fill in all required fields");
+			return;
+		}
+
+		// Validate amount is a positive number
+		if (isNaN(transactionData.amount) || transactionData.amount <= 0) {
+			toast.error("Please enter a valid amount");
+			return;
+		}
+
+		try {
+			await createTransaction({ 
+				variables: { input: transactionData },
+				refetchQueries: ["GetUserAndTransactions"]
+			});
+
+			form.reset();
+			toast.success("Transaction created successfully");
+		} catch (error) {
+			console.error("Transaction creation error:", error);
+			toast.error(error.message || "Failed to create transaction");
+		}
 	};
 
 	return (
@@ -50,9 +82,11 @@ const TransactionForm = () => {
 							className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 							id='paymentType'
 							name='paymentType'
+							required
 						>
-							<option value={"card"}>Card</option>
-							<option value={"cash"}>Cash</option>
+							<option value="">Select payment type</option>
+							<option value="card">Card</option>
+							<option value="cash">Cash</option>
 						</select>
 						<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 							<svg
@@ -79,10 +113,12 @@ const TransactionForm = () => {
 							className='block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500'
 							id='category'
 							name='category'
+							required
 						>
-							<option value={"saving"}>Saving</option>
-							<option value={"expense"}>Expense</option>
-							<option value={"investment"}>Investment</option>
+							<option value="">Select category</option>
+							<option value="saving">Saving</option>
+							<option value="expense">Expense</option>
+							<option value="investment">Investment</option>
 						</select>
 						<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 							<svg
@@ -106,6 +142,9 @@ const TransactionForm = () => {
 						id='amount'
 						name='amount'
 						type='number'
+						required
+						min="0.01"
+						step="0.01"
 						placeholder='150'
 					/>
 				</div>
@@ -138,6 +177,7 @@ const TransactionForm = () => {
 						type='date'
 						name='date'
 						id='date'
+						required
 						className='appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-[11px] px-4 mb-3 leading-tight focus:outline-none
 						 focus:bg-white'
 						placeholder='Select date'
@@ -150,8 +190,9 @@ const TransactionForm = () => {
           from-pink-500 to-pink-500 hover:from-pink-600 hover:to-pink-600
 						disabled:opacity-70 disabled:cursor-not-allowed'
 				type='submit'
+				disabled={loading}
 			>
-				Add Transaction
+				{loading ? "Loading..." : "Add Transaction"}
 			</button>
 		</form>
 	);

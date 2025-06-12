@@ -1,4 +1,4 @@
- import Transaction from "../models/transaction.model.js";
+import Transaction from "../models/transaction.model.js";
 import User from "../models/user.model.js";
 
 const transactionResolver = {
@@ -37,7 +37,7 @@ const transactionResolver = {
 				return newTransaction;
 			} catch (err) {
 				console.error("Error creating transaction:", err);
-				throw new Error("Error creating transaction");
+				throw new Error(err.message || "Error creating transaction");
 			}
 		},
 		updateTransaction: async (_, { input }) => {
