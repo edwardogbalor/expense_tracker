@@ -47,31 +47,53 @@ const HomePage = () => {
 	if (loading) return <div>Loading...</div>;
 
 	return (
-		<>
-			<div className='flex flex-col gap-6 items-center max-w-7xl mx-auto z-20 relative justify-center'>
-				<div className='flex items-center'>
-					<p className='md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text'>
-						Spend wisely, track wisely
-					</p>
-					<img
-						src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
-						className='w-11 h-11 rounded-full border cursor-pointer'
-						alt='Avatar'
-					/>
-					{!loading && <MdLogout className='mx-2 w-5 h-5 cursor-pointer' onClick={handleLogout} />}
-					{/* loading spinner */}
-					{loading && <div className='w-6 h-6 border-t-2 border-b-2 mx-2 rounded-full animate-spin'></div>}
+		<div className="p-6 text-white bg-[#0d0d0d] min-h-screen">
+			{/* Grid of summary cards: total balance, etc. */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+				{/* Total Balance */}
+				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
+					<p className="text-sm text-gray-400">Total Balance</p>
+					<h2 className="text-2xl font-bold mt-2">$5,170.00</h2>
 				</div>
-				<div className='flex flex-wrap w-full justify-center items-center gap-6'>
-					<div className='h-[330px] w-[330px] md:h-[360px] md:w-[360px]  '>
-						<Doughnut data={chartData} />
-					</div>
 
-					<TransactionForm />
+				{/* Remaining Budget */}
+				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
+					<p className="text-sm text-gray-400">Remaining Budget</p>
+					<h2 className="text-2xl font-bold mt-2">$800.00</h2>
 				</div>
-				<Cards />
+
+				{/* Month-to-Date */}
+				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
+					<p className="text-sm text-gray-400">Month-to-Date</p>
+					<h2 className="text-2xl font-bold mt-2">$2,350.00</h2>
+				</div>
+
+				{/* Net Worth */}
+				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
+					<p className="text-sm text-gray-400">Net Worth</p>
+					<h2 className="text-2xl font-bold mt-2">$16,370.00</h2>
+				</div>
 			</div>
-		</>
+
+			{/* Chart + spending category */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+				<div className="bg-[#1a1a1a] p-4 rounded-lg">
+					<Doughnut data={chartData} />
+				</div>
+				<div className="bg-[#1a1a1a] p-4 rounded-lg">
+					{/* bar chart or placeholder text like: "Spending by Category" */}
+				</div>
+			</div>
+
+			{/* Form + recent transactions */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+				<TransactionForm />
+				<div className="bg-[#1a1a1a] p-4 rounded-lg">
+					<h2 className="text-lg font-bold mb-2">Recent Transactions</h2>
+					<Cards />
+				</div>
+			</div>
+		</div>
 	);
 };
 export default HomePage;
