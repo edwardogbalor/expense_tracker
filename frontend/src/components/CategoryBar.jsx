@@ -1,26 +1,48 @@
-import React from 'react';
+// src/components/CategoryBar.jsx
+import React from "react";
+import { useQuery } from '@apollo/client';
+import { GET_CATEGORY_TOTALS } from '../graphql/queries/statistics.query';
 
-const categories = [
-  { name: 'Food', percent: 90, color: 'bg-teal-400' },
-  { name: 'Housing', percent: 50, color: 'bg-gray-400' },
-  { name: 'Transport', percent: 65, color: 'bg-blue-400' },
-  { name: 'Entertainment', percent: 30, color: 'bg-yellow-400' },
-];
+const CategoryBar = () => {
+  const { data, loading, error } = useQuery(GET_CATEGORY_TOTALS);
 
-const CategoryBars = () => {
-  return (
-    <div className="space-y-4 w-full max-w-md">
-      {categories.map((cat) => (
-        <div key={cat.name}>
-          <div className="flex justify-between mb-1 text-sm text-gray-600">
-            <span>{cat.name}</span>
-            <span>{cat.percent}%</span>
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i}>
+            <div className="flex justify-between mb-1">
+              <div className="h-4 bg-gray-700 rounded w-20 animate-pulse"></div>
+              <div className="h-4 bg-gray-700 rounded w-12 animate-pulse"></div>
+            </div>
+            <div className="w-full bg-gray-800 rounded-full h-3">
+              <div className="h-3 rounded-full bg-gray-700 animate-pulse" style={{ width: `${Math.random() * 60 + 20}%` }}></div>
+            </div>
           </div>
-          <div className="w-full bg-gray-200 h-2 rounded-full">
+        ))}
+      </div>
+    );
+  }
+  
+  if (error) return <p className="text-red-400">Error loading data</p>;
+
+  const categories = data?.categoryTotals || [];
+
+  return (
+    <div className="space-y-4">
+      {categories.map((cat) => (
+        <div key={cat.category}>
+          <div className="flex justify-between mb-1">
+            <span>{cat.category}</span>
+            <span className="text-sm text-gray-400">
+              {cat.percent.toFixed(2)}%
+          </span>
+          </div>
+          <div className="w-full bg-gray-800 rounded-full h-3">
             <div
-              className={`${cat.color} h-2 rounded-full`}
-              style={{ width: `${cat.percent}%` }}
-            />
+              className="h-3 rounded-full bg-teal-400" // 🔧 optional: use dynamic color later
+              style={{ width: `${Math.min(cat.percent, 100)}%` }}
+            ></div>
           </div>
         </div>
       ))}
@@ -28,4 +50,4 @@ const CategoryBars = () => {
   );
 };
 
-export default CategoryBars;
+export default CategoryBar;

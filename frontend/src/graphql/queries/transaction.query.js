@@ -41,3 +41,21 @@ export const GET_TRANSACTION_STATISTICS = gql`
 		}
 	}
 `;
+
+export const GET_REMAINING_BUDGET = gql`
+  query GetRemainingBudget {
+    remainingBudget
+  }
+`;
+
+export const GET_MONTH_TO_DATE = gql`
+  query GetMonthToDate {
+    monthToDate
+  }
+`;
+
+export const GET_NET_WORTH = gql`
+  query GetNetWorth {
+    netWorth
+  }
+`;
