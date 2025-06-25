@@ -17,7 +17,7 @@ import Cards from "../components/Cards.jsx";
 import TransactionForm from "../components/TransactionForm.jsx";
 
 import { MdLogout } from "react-icons/md";
-import { lineChartData, lineChartOptions } from "../components/LineChartData.js";
+import LineChart from "../components/LineChartData.jsx";
 import CategoryBar from "../components/CategoryBar.jsx";
 import { GET_TOTAL_BALANCE } from "../graphql/queries/statistics.query.js";
 import { useQuery } from "@apollo/client";
@@ -25,6 +25,7 @@ import RecentTransactions from "../components/RecentTransactions.jsx";
 import { GET_REMAINING_BUDGET } from "../graphql/queries/transaction.query.js";
 import { GET_MONTH_TO_DATE } from "../graphql/queries/transaction.query.js";
 import { GET_NET_WORTH } from "../graphql/queries/transaction.query.js"
+import PieChart from "../components/PieChart.jsx";
 
 ChartJS.register(
 	ArcElement,
@@ -129,11 +130,8 @@ const HomePage = () => {
 			{/* Chart + spending category */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 				<div className="bg-[#1a1a1a] p-4 rounded-lg">
-					<Doughnut data={chartData} />
-				</div>
-				<div className="bg-[#1a1a1a] p-4 rounded-lg">
 					<h2 className="text-lg font-bold mb-4">Account Balance</h2>
-					<Line data={lineChartData} options={lineChartOptions} />
+					<LineChart />
 				</div>
 				<div className="bg-[#1a1a1a] p-4 rounded-lg">
 					<h2 className="text-lg font-bold mb-4">Spending by Category</h2>
@@ -144,8 +142,11 @@ const HomePage = () => {
 
 			{/* Form + recent transactions */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<TransactionForm />
+				
 				<RecentTransactions />
+				<div className="bg-[#1a1a1a] p-4 rounded-lg">
+					<PieChart />
+				</div>
 			</div>
 		</div>
 	);

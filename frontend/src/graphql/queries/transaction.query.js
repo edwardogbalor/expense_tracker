@@ -59,3 +59,23 @@ export const GET_NET_WORTH = gql`
     netWorth
   }
 `;
+
+export const GET_BALANCE_HISTORY = gql`
+  query GetBalanceHistory {
+    getBalanceHistory {
+      date
+      balance
+    }
+  }
+`;
+
+export const GET_CATEGORY_BREAKDOWN = gql`
+  query GetCategoryBreakdown {
+    categoryBreakdown {
+      category
+      total
+    }
+  }
+`;
+
+

@@ -16,20 +16,26 @@ const transactionTypeDef = `#graphql
     percent: Float!
   }
 
-  type PaymentBreakdown {
-    paymentType: String!
+  type CategoryBreakdown {
+    category: String!
     total: Float!
   }
+
+  type BalancePoint {
+  date: String!
+  balance: Float!
+}
 
   type Query {
     transactions: [Transaction!]
     transaction(transactionId:ID!): Transaction
     totalBalance: Float!
     categoryTotals: [CategoryTotal!]!
-    paymentBreakdown: [PaymentBreakdown!]!
+    categoryBreakdown: [CategoryBreakdown!]!
     remainingBudget: Float!
-     monthToDate: Float!
-     netWorth: Float!
+    monthToDate: Float!
+    netWorth: Float!
+    getBalanceHistory: [BalancePoint!]!
     #TODO => ADD categoryStatistics query
   }
 

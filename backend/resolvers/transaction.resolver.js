@@ -64,34 +64,23 @@ const transactionResolver = {
 			  throw new Error("Error getting category totals");
 			}
 		},
-		paymentBreakdown: async (_, __, context) => {
-			try {
-			  if (!context.getUser()) throw new Error("Not authenticated");
+		categoryBreakdown: async (_, __, context) => {
+			const user = context.getUser();
+			if (!user) throw new Error("Not authenticated");
 		  
-			  const userId = context.getUser()._id;
+			const transactions = await Transaction.find({ userId: user._id });
 		  
-			  const result = await Transaction.aggregate([
-				{ $match: { userId } },
-				{
-				  $group: {
-					_id: "$paymentType",
-					total: { $sum: "$amount" }
-				  }
-				},
-				{
-				  $project: {
-					paymentType: "$_id",
-					total: 1,
-					_id: 0
-				  }
-				}
-			  ]);
+			const categoryTotals = {};
 		  
-			  return result;
-			} catch (err) {
-			  console.error("Error getting payment breakdown:", err);
-			  throw new Error("Error getting payment breakdown");
+			for (const tx of transactions) {
+			  const cat = tx.category.toLowerCase();
+			  categoryTotals[cat] = (categoryTotals[cat] || 0) + tx.amount;
 			}
+		  
+			return Object.entries(categoryTotals).map(([category, total]) => ({
+			  category,
+			  total,
+			}));
 		  },
 		  remainingBudget: async (_, __, context) => {
 			const user = context.getUser();
@@ -142,6 +131,34 @@ const transactionResolver = {
 			const ASSETS = 15000; // Fake asset value (e.g., savings, crypto, etc.)
 			return totalBalance + ASSETS;
 		  },
+
+		  getBalanceHistory: async (_, __, context) => {
+			const user = context.getUser();
+			if (!user) throw new Error("Not authenticated");
+		  
+			const transactions = await Transaction.find({ userId: user._id }).sort({ date: 1 });
+		  
+			let runningBalance = 0;
+			const history = transactions.map((tx) => {
+			  if (tx.paymentType.toLowerCase() === "income") {
+				runningBalance += tx.amount;
+			  } else {
+				runningBalance -= tx.amount;
+			  }
+		  
+			  return {
+				date: tx.date,
+				balance: runningBalance,
+			  };
+			});
+		  
+			return history.map((h) => ({
+				date: h.date.toISOString(), // ⬅️ This fixes the "Invalid Date" issue
+				balance: h.balance,
+			  }));
+			  
+		  },
+		  
 		  
 	},
 	Mutation: {
