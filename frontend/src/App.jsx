@@ -4,7 +4,6 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import TransactionPage from "./pages/TransactionPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import Header from "./components/ui/Header";
 import { useQuery } from "@apollo/client";
 import { GET_AUTHENTICATED_USER } from "./graphql/queries/user.query";
 import { Toaster } from "react-hot-toast";
@@ -16,7 +15,6 @@ function App() {
 
 	return (
 		<>
-			{data?.authUser && <Header />}
 			<Routes>
 				<Route path='/' element={data.authUser ? <HomePage /> : <Navigate to='/login' />} />
 				<Route path='/login' element={!data.authUser ? <LoginPage /> : <Navigate to='/' />} />

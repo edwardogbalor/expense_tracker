@@ -84,12 +84,15 @@ const HomePage = () => {
 
 	return (
 		<div className="p-6 text-white bg-[#0d0d0d] min-h-screen">
+			<h1 className="text-2xl font-bold mb-6 text-left">Dashboard</h1>
 			{/* Grid of summary cards: total balance, etc. */}
 			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 				{/* Total Balance */}
 				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
 					<p className="text-sm text-gray-400">Total Balance</p>
+					<p className="text-2xl font-semibold text-white">
 					{balanceLoading ? "Loading..." : `$${balanceData?.totalBalance?.toFixed(2) || "0.00"}`}
+					</p>
 				</div>
 
 				{/* Remaining Budget */}
@@ -144,7 +147,7 @@ const HomePage = () => {
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 				
 				<RecentTransactions />
-				<div className="bg-[#1a1a1a] p-4 rounded-lg">
+				<div className="bg-[#1a1a1a] p-4 rounded-lg shadow w-full max-w-md mx-auto h-[320px]">
 					<PieChart />
 				</div>
 			</div>
