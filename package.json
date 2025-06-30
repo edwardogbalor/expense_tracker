@@ -12,11 +12,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@apollo/server": "^4.12.1",
+    "@apollo/server": "^4.12.2",
     "@graphql-tools/merge": "^9.0.24",
     "bcryptjs": "^3.0.2",
     "connect-mongodb-session": "^5.0.0",
-    "dotenv": "^16.5.0",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
     "express-session": "^1.18.1",
     "graphql": "^16.11.0",
@@ -26,6 +26,14 @@
     "react-toastify": "^11.0.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/connect-mongodb-session": "^2.4.8",
+    "@types/cors": "^2.8.19",
+    "@types/express-session": "^1.18.2",
+    "@types/mongoose": "^5.11.96",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }
