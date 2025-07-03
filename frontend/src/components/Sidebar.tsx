@@ -1,8 +1,24 @@
 import { PresentationChartBarIcon, PlusCircleIcon, ClipboardDocumentListIcon, Cog6ToothIcon, PowerIcon } from "@heroicons/react/24/solid";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { LOGOUT } from "../graphql/mutations/user.mutation";
+import { toast } from "react-hot-toast";
 
 export function DefaultSidebar() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [logout, { client }] = useMutation(LOGOUT, { refetchQueries: ["GetAuthenticatedUser"] });
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      await client.resetStore();
+      navigate("/login");
+    } catch (error) {
+      toast.error((error as Error).message || "Logout failed");
+    }
+  };
+
   return (
     <nav className="flex flex-col h-full bg-[#111318] text-white py-8 px-4 w-64">
       <div className="mb-10 px-2">
@@ -36,7 +52,7 @@ export function DefaultSidebar() {
         </li>
       </ul>
       <div className="mt-auto">
-        <button className="flex items-center gap-3 px-3 py-2 rounded-lg w-full transition hover:bg-[#23272f] text-left">
+        <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2 rounded-lg w-full transition hover:bg-[#23272f] text-left">
           <PowerIcon className="h-5 w-5" />
           <span>Log Out</span>
         </button>
