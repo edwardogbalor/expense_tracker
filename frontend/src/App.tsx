@@ -8,6 +8,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { useQuery } from "@apollo/client";
 import { GET_AUTHENTICATED_USER } from "./graphql/queries/user.query";
 import { Toaster } from "react-hot-toast";
+import Layout from "./components/Layout";
 
 function App() {
 	const { loading, data } = useQuery(GET_AUTHENTICATED_USER);
@@ -16,6 +17,7 @@ function App() {
 
 	return (
 		<>
+		<Layout>
 			<Routes>
 				<Route path='/' element={data.authUser ? <HomePage /> : <Navigate to='/login' />} />
 				<Route path='/login' element={!data.authUser ? <LoginPage /> : <Navigate to='/' />} />
@@ -26,6 +28,7 @@ function App() {
 				/>
 				<Route path='*' element={<NotFoundPage />} />
 			</Routes>
+			</Layout>
 			<Toaster />
 		</>
 	);

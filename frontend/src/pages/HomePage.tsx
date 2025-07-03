@@ -83,72 +83,69 @@ const HomePage = () => {
 	}
 
 	return (
-		<div className="p-6 text-white bg-[#0d0d0d] min-h-screen">
-			<h1 className="text-2xl font-bold mb-6 text-left">Dashboard</h1>
-			{/* Grid of summary cards: total balance, etc. */}
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-				{/* Total Balance */}
-				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
-					<p className="text-sm text-gray-400">Total Balance</p>
-					<p className="text-2xl font-semibold text-white">
-					{balanceLoading ? "Loading..." : `$${balanceData?.totalBalance?.toFixed(2) || "0.00"}`}
-					</p>
-				</div>
-
-				{/* Remaining Budget */}
-				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
-					<p className="text-sm text-gray-400">Remaining Budget</p>
-					<p className="text-2xl font-semibold text-white">
-						{budgetLoading
-							? "Loading..."
-							: budgetError
-							? "Error"
-							: `$${budgetData?.remainingBudget?.toFixed(2) || "0.00"}`}
+		<div className="flex flex-col h-screen overflow-hidden bg-[#0d0d0d] text-white">
+			<h1 className="text-2xl font-bold mb-3 text-left">Dashboard</h1>
+			<div className="flex-1 flex flex-col justify-between min-h-0">
+				{/* Grid of summary cards: total balance, etc. */}
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+					{/* Total Balance */}
+					<div className="bg-[#1a1a1a] p-3 rounded-lg text-center shadow-lg">
+						<p className="text-sm text-gray-400">Total Balance</p>
+						<p className="text-2xl font-semibold text-white">
+						{balanceLoading ? "Loading..." : `$${balanceData?.totalBalance?.toFixed(2) || "0.00"}`}
 						</p>
+					</div>
+					{/* Remaining Budget */}
+					<div className="bg-[#1a1a1a] p-3 rounded-lg text-center shadow-lg">
+						<p className="text-sm text-gray-400">Remaining Budget</p>
+						<p className="text-2xl font-semibold text-white">
+							{budgetLoading
+								? "Loading..."
+								: budgetError
+								? "Error"
+								: `$${budgetData?.remainingBudget?.toFixed(2) || "0.00"}`}
+							</p>
+					</div>
+					{/* Month-to-Date */}
+					<div className="bg-[#1a1a1a] p-3 rounded-lg text-center shadow-lg">
+						<p className="text-sm text-gray-400">Month-to-Date</p>
+						<p className="text-2xl font-semibold text-white">
+							{mtdLoading
+								? "Loading..."
+								: mtdError
+								? "Error"
+								: `$${mtdData?.monthToDate?.toFixed(2) || "0.00"}`}
+						</p>
+					</div>
+					{/* Net Worth */}
+					<div className="bg-[#1a1a1a] p-3 rounded-lg text-center shadow-lg">
+						<p className="text-sm text-gray-400">Net Worth</p>
+						<p className="text-2xl font-semibold text-white">
+							{netWorthLoading
+								? "Loading..."
+								: `$${netWorthData?.netWorth?.toFixed(2) || "0.00"}`}
+						</p>
+					</div>
 				</div>
 
-				{/* Month-to-Date */}
-				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
-					<p className="text-sm text-gray-400">Month-to-Date</p>
-					<p className="text-2xl font-semibold text-white">
-						{mtdLoading
-							? "Loading..."
-							: mtdError
-							? "Error"
-							: `$${mtdData?.monthToDate?.toFixed(2) || "0.00"}`}
-					</p>
+				{/* Chart + spending category */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3 min-h-0">
+					<div className="bg-[#1a1a1a] p-3 rounded-lg min-h-0">
+						<h2 className="text-lg font-bold mb-2">Account Balance</h2>
+						<LineChart />
+					</div>
+					<div className="bg-[#1a1a1a] p-3 rounded-lg min-h-0">
+						<h2 className="text-lg font-bold mb-2">Spending by Category</h2>
+						<CategoryBar />
+					</div>
 				</div>
 
-				{/* Net Worth */}
-				<div className="bg-[#1a1a1a] p-4 rounded-lg text-center shadow-lg">
-					<p className="text-sm text-gray-400">Net Worth</p>
-					<p className="text-2xl font-semibold text-white">
-						{netWorthLoading
-							? "Loading..."
-							: `$${netWorthData?.netWorth?.toFixed(2) || "0.00"}`}
-					</p>
-				</div>
-			</div>
-
-			{/* Chart + spending category */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-				<div className="bg-[#1a1a1a] p-4 rounded-lg">
-					<h2 className="text-lg font-bold mb-4">Account Balance</h2>
-					<LineChart />
-				</div>
-				<div className="bg-[#1a1a1a] p-4 rounded-lg">
-					<h2 className="text-lg font-bold mb-4">Spending by Category</h2>
-					<CategoryBar />
-				</div>
-
-			</div>
-
-			{/* Form + recent transactions */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				
-				<RecentTransactions />
-				<div className="bg-[#1a1a1a] p-4 rounded-lg shadow w-full max-w-md mx-auto h-[320px]">
-					<PieChart />
+				{/* Form + recent transactions */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-0 flex-1">
+					<RecentTransactions />
+					<div className="bg-[#1a1a1a] p-3 rounded-lg shadow w-full max-w-md mx-auto h-[260px] min-h-0">
+						<PieChart />
+					</div>
 				</div>
 			</div>
 		</div>

@@ -82,4 +82,10 @@ export const GET_CATEGORY_BREAKDOWN = gql`
   }
 `;
 
+export function formatDate(dateValue: string | number) {
+  const date = new Date(dateValue); // Handles both ISO string and timestamp
+  const options: Intl.DateTimeFormatOptions = { day: "2-digit", month: "short", year: "numeric" };
+  return date.toLocaleDateString("en-US", options);
+}
+
 

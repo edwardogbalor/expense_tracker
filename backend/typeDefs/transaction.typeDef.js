@@ -1,10 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const transactionTypeDef = `#graphql
   type Transaction {
     _id: ID!
     userId: ID!
     description: String!
-    transactionType: String
-    paymentType: String
+    transactionType: String!
+    paymentType: String!
     category: String!
     amount: Float!
     location: String
@@ -48,8 +50,8 @@ const transactionTypeDef = `#graphql
 
   input CreateTransactionInput {
     description: String!
-    transactionType: String
-    paymentType: String
+    transactionType: String!
+    paymentType: String!
     category: String!
     amount: Float!
     date: String!
@@ -67,5 +69,4 @@ const transactionTypeDef = `#graphql
     date: String
   }
 `;
-
-export default transactionTypeDef;
+exports.default = transactionTypeDef;

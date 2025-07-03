@@ -67,5 +67,4 @@ const transactionTypeDef = `#graphql
     date: String
   }
 `;
-
 export default transactionTypeDef;

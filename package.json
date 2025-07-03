@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node backend/index.js",
-    "dev": "nodemon backend/index.js"
+    "start": "NODE_OPTIONS=--loader ts-node/esm ts-node backend/index.ts",
+    "dev": "nodemon --watch backend --exec \"NODE_OPTIONS=--loader ts-node/esm ts-node backend/index.ts\""
   },
   "type": "module",
   "keywords": [],

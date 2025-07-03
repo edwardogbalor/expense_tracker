@@ -4,11 +4,12 @@ import { GET_TRANSACTIONS } from "../graphql/queries/transaction.query.js";
 import { formatDate } from "../utils/formatDate.js";
 
 interface Transaction {
-  id: string;
+  _id: string;
   date: string;
   description: string;
   category: string;
-  paymentType: string;
+  paymentType?: string;
+  transactionType?: string;
   amount: number;
 }
 
@@ -16,7 +17,10 @@ const RecentTransactions = () => {
   const { data, loading, error } = useQuery(GET_TRANSACTIONS);
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error loading transactions</p>;
+  if (error) {
+    console.error('Error loading transactions:', error);
+    return <p>Error loading transactions</p>;
+  }
 
   const transactions: Transaction[] = data?.transactions || [];
 
@@ -35,11 +39,11 @@ const RecentTransactions = () => {
     </thead>
     <tbody>
       {transactions.map((txn: Transaction) => (
-        <tr key={txn.id} className="border-b border-gray-800 hover:bg-[#2a2a2a]">
-          <td className="py-2">{formatDate(txn.date)}</td>                       {/* 🔧 UPDATED */}
-          <td className="py-2">{txn.description}</td>                                  {/* 🔧 UPDATED */}
+        <tr key={txn._id} className="border-b border-gray-800 hover:bg-[#2a2a2a]">
+          <td className="py-2">{formatDate(txn.date)}</td>
+          <td className="py-2">{txn.description}</td>
           <td className="py-2 capitalize">{txn.category}</td>
-          <td className="py-2 capitalize">{txn.paymentType}</td>
+          <td className="py-2 capitalize">{txn.paymentType || "-"}</td>
           <td className="py-2 text-right">${txn.amount.toFixed(2)}</td>
         </tr>
       ))}
