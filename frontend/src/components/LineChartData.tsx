@@ -2,7 +2,18 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import { GET_BALANCE_HISTORY } from "../graphql/queries/transaction.query.js";
 import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend
+} from "chart.js";
 
+// Register required elements for Line charts
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 interface BalancePoint {
   date: string;

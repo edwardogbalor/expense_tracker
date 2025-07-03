@@ -1,0 +1,11 @@
+{
+  "name": "expense-tracker-backend",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

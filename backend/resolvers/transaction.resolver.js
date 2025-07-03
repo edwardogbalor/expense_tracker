@@ -1,32 +1,27 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const transaction_model_js_1 = __importDefault(require("../models/transaction.model.js"));
+import Transaction from "../models/transaction.model.js";
 const transactionResolver = {
     Query: {
         transactions: async (_, __, context) => {
             if (!context.getUser())
                 throw new Error("Unauthorized");
             const userId = context.getUser()._id;
-            return await transaction_model_js_1.default.find({ userId });
+            return await Transaction.find({ userId });
         },
         transaction: async (_, { transactionId }) => {
-            return await transaction_model_js_1.default.findById(transactionId);
+            return await Transaction.findById(transactionId);
         },
         totalBalance: async (_, __, context) => {
             const user = context.getUser();
             if (!user)
                 throw new Error("Not authenticated");
-            const transactions = await transaction_model_js_1.default.find({ userId: user._id });
+            const transactions = await Transaction.find({ userId: user._id });
             return transactions.reduce((sum, tx) => tx.transactionType === "income" ? sum + tx.amount : sum - tx.amount, 0);
         },
         categoryTotals: async (_, __, context) => {
             if (!context.getUser())
                 throw new Error("Not authenticated");
             const userId = context.getUser()._id;
-            const stats = await transaction_model_js_1.default.aggregate([
+            const stats = await Transaction.aggregate([
                 { $match: { userId } },
                 { $group: { _id: "$category", totalAmount: { $sum: "$amount" } } }
             ]);
@@ -41,7 +36,7 @@ const transactionResolver = {
             const user = context.getUser();
             if (!user)
                 throw new Error("Not authenticated");
-            const transactions = await transaction_model_js_1.default.find({ userId: user._id });
+            const transactions = await Transaction.find({ userId: user._id });
             const breakdown = {};
             for (const tx of transactions) {
                 const cat = tx.category.toLowerCase();
@@ -53,7 +48,7 @@ const transactionResolver = {
             const user = context.getUser();
             if (!user)
                 throw new Error("Not authenticated");
-            const transactions = await transaction_model_js_1.default.find({ userId: user._id });
+            const transactions = await Transaction.find({ userId: user._id });
             const expenses = transactions
                 .filter(tx => tx.transactionType === "expense")
                 .reduce((sum, tx) => sum + tx.amount, 0);
@@ -64,7 +59,7 @@ const transactionResolver = {
             const user = context.getUser();
             if (!user)
                 throw new Error("Not authenticated");
-            const transactions = await transaction_model_js_1.default.find({ userId: user._id });
+            const transactions = await Transaction.find({ userId: user._id });
             const now = new Date();
             const currentMonth = now.getMonth();
             const currentYear = now.getFullYear();
@@ -78,7 +73,7 @@ const transactionResolver = {
             const user = context.getUser();
             if (!user)
                 throw new Error("Not authenticated");
-            const transactions = await transaction_model_js_1.default.find({ userId: user._id });
+            const transactions = await Transaction.find({ userId: user._id });
             const total = transactions.reduce((sum, tx) => tx.transactionType === "income" ? sum + tx.amount : sum - tx.amount, 0);
             const ASSETS = 15000;
             return total + ASSETS;
@@ -87,7 +82,7 @@ const transactionResolver = {
             const user = context.getUser();
             if (!user)
                 throw new Error("Not authenticated");
-            const transactions = await transaction_model_js_1.default.find({ userId: user._id }).sort({ date: 1 });
+            const transactions = await Transaction.find({ userId: user._id }).sort({ date: 1 });
             let balance = 0;
             const history = transactions.map(tx => {
                 balance += tx.transactionType === "income" ? tx.amount : -tx.amount;
@@ -98,16 +93,16 @@ const transactionResolver = {
     },
     Mutation: {
         createTransaction: async (_, { input }, context) => {
-            const newTx = new transaction_model_js_1.default({ ...input, userId: context.getUser()._id });
+            const newTx = new Transaction({ ...input, userId: context.getUser()._id });
             await newTx.save();
             return newTx;
         },
         updateTransaction: async (_, { input }) => {
-            return await transaction_model_js_1.default.findByIdAndUpdate(input.transactionId, input, { new: true });
+            return await Transaction.findByIdAndUpdate(input.transactionId, input, { new: true });
         },
         deleteTransaction: async (_, { transactionId }) => {
-            return await transaction_model_js_1.default.findByIdAndDelete(transactionId);
+            return await Transaction.findByIdAndDelete(transactionId);
         }
     }
 };
-exports.default = transactionResolver;
+export default transactionResolver;

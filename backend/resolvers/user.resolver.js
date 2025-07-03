@@ -1,11 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const transaction_model_js_1 = __importDefault(require("../models/transaction.model.js"));
-const user_model_js_1 = __importDefault(require("../models/user.model.js"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
+import Transaction from "../models/transaction.model.js";
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
 const userResolver = {
     Mutation: {
         signUp: async (parent, { input }, context) => {
@@ -18,16 +13,16 @@ const userResolver = {
                 if (!["male", "female"].includes(gender)) {
                     throw new Error("Gender must be either 'male' or 'female'");
                 }
-                const existingUser = await user_model_js_1.default.findOne({ username });
+                const existingUser = await User.findOne({ username });
                 if (existingUser) {
                     throw new Error("User already exists");
                 }
-                const salt = await bcryptjs_1.default.genSalt(10);
-                const hashedPassword = await bcryptjs_1.default.hash(password, salt);
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
                 // https://avatar-placeholder.iran.liara.run/
                 const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
                 const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
-                const newUser = new user_model_js_1.default({
+                const newUser = new User({
                     username,
                     name,
                     password: hashedPassword,
@@ -92,7 +87,7 @@ const userResolver = {
                     return null;
                 }
                 // Fetch the full user document from database
-                const fullUser = await user_model_js_1.default.findById(user._id);
+                const fullUser = await User.findById(user._id);
                 return fullUser;
             }
             catch (err) {
@@ -102,7 +97,7 @@ const userResolver = {
         },
         user: async (parent, { userId }) => {
             try {
-                const user = await user_model_js_1.default.findById(userId);
+                const user = await User.findById(userId);
                 if (!user) {
                     throw new Error("User not found");
                 }
@@ -118,7 +113,7 @@ const userResolver = {
     User: {
         transactions: async (parent) => {
             try {
-                const transactions = await transaction_model_js_1.default.find({ userId: parent._id });
+                const transactions = await Transaction.find({ userId: parent._id });
                 return transactions;
             }
             catch (err) {
@@ -129,4 +124,4 @@ const userResolver = {
         },
     },
 };
-exports.default = userResolver;
+export default userResolver;

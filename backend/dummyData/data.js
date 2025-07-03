@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.transactions = exports.users = void 0;
 // Hardcoded array of 5 users
 const users = [
     {
@@ -44,7 +41,6 @@ const users = [
         gender: "male",
     },
 ];
-exports.users = users;
 // Hardcoded array of 5 transactions
 const transactions = [
     {
@@ -98,4 +94,5 @@ const transactions = [
         date: "2024-01-05",
     },
 ];
-exports.transactions = transactions;
+// Export the arrays
+export { users, transactions };

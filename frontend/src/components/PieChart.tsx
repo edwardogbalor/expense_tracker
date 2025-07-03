@@ -2,6 +2,15 @@ import React from "react";
 import { useQuery } from "@apollo/client";
 import { GET_CATEGORY_BREAKDOWN } from "../graphql/queries/transaction.query.js";
 import { Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+// Register required elements for Doughnut/Pie charts
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface CategoryBreakdownItem {
   category: string;

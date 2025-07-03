@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const userTypeDef = `#graphql
   type User {
     _id: ID!
@@ -38,4 +36,4 @@ const userTypeDef = `#graphql
     message: String!
   }
 `;
-exports.default = userTypeDef;
+export default userTypeDef;
