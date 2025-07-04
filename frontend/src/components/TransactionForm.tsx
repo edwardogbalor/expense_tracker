@@ -1,57 +1,77 @@
 import React from "react";
 import { useMutation } from "@apollo/client";
-import { CREATE_TRANSACTION } from "../graphql/mutations/transaction.mutation.js";
+import { CREATE_TRANSACTION, UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation.js";
 import toast from "react-hot-toast";
 
-const TransactionForm = () => {
-	// TODO => WHEN RELATIONSHIPS ARE ADDED, CHANGE THE REFETCH QUERY A BIT
-	const [createTransaction, { loading }] = useMutation(CREATE_TRANSACTION, {refetchQueries: ["GetTransactions"]});
+interface TransactionFormProps {
+	initialValues?: {
+		_id?: string;
+		description: string;
+		transactionType: string;
+		paymentType: string;
+		category: string;
+		amount: number;
+		location: string;
+		date: string;
+	};
+	mode?: "add" | "edit";
+	onClose?: () => void;
+}
+
+const TransactionForm: React.FC<TransactionFormProps> = ({ initialValues, mode = "add", onClose }) => {
+	const [formState, setFormState] = React.useState({
+		description: initialValues?.description || "",
+		transactionType: initialValues?.transactionType || "",
+		paymentType: initialValues?.paymentType || "",
+		category: initialValues?.category || "",
+		amount: initialValues?.amount?.toString() || "",
+		location: initialValues?.location || "",
+		date: initialValues?.date || "",
+	});
+
+	const [createTransaction, { loading: creating }] = useMutation(CREATE_TRANSACTION, {refetchQueries: ["GetTransactions"]});
+	const [updateTransaction, { loading: updating }] = useMutation(UPDATE_TRANSACTION, {refetchQueries: ["GetTransactions"]});
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+		const { name, value } = e.target;
+		setFormState((prev) => ({ ...prev, [name]: value }));
+	};
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
-		const form = e.target as HTMLFormElement;
-		const formData = new FormData(form);
 		const transactionData = {
-			description: formData.get("description"),
-			transactionType: formData.get("transactionType"),
-			paymentType: formData.get("paymentType"),
-			category: formData.get("category"),
-			amount: parseFloat((formData.get("amount") as string) || "0"),
-			location: formData.get("location") || "Unknown",
-			date: formData.get("date"),
+			...formState,
+			amount: parseFloat(formState.amount || "0"),
+			_id: initialValues?._id,
 		};
-
-		// Validate required fields
-		if (!transactionData.description || !transactionData.transactionType || 
-			!transactionData.paymentType || !transactionData.category || 
-			!transactionData.amount || !transactionData.date) {
+		if (!transactionData.description || !transactionData.transactionType || !transactionData.paymentType || !transactionData.category || !transactionData.amount || !transactionData.date) {
 			toast.error("Please fill in all required fields");
 			return;
 		}
-
-		// Validate amount is a positive number
 		if (isNaN(transactionData.amount) || transactionData.amount <= 0) {
 			toast.error("Please enter a valid amount");
 			return;
 		}
-
 		try {
-			await createTransaction({ 
-				variables: { input: transactionData },
-				refetchQueries: ["GetUserAndTransactions"]
-			});
-
-			form.reset();
-			toast.success("Transaction created successfully");
+			if (mode === "edit" && initialValues?._id) {
+				await updateTransaction({ variables: { input: { ...transactionData, transactionId: initialValues._id } } });
+				toast.success("Transaction updated successfully");
+			} else {
+				await createTransaction({ variables: { input: transactionData } });
+				toast.success("Transaction created successfully");
+			}
+			if (onClose) onClose();
+			setFormState({ description: "", transactionType: "", paymentType: "", category: "", amount: "", location: "", date: "" });
 		} catch (error) {
-			console.error("Transaction creation error:", error);
-			toast.error((error as Error).message || "Failed to create transaction");
+			toast.error((error as Error).message || "Failed to submit transaction");
 		}
 	};
 
 	return (
-		<form className='w-full max-w-lg flex flex-col gap-5 px-3' onSubmit={handleSubmit}>
+		<form className='w-full max-w-lg flex flex-col gap-5 px-3 relative' onSubmit={handleSubmit}>
+			{mode === "edit" && onClose && (
+				<button type="button" onClick={onClose} className="absolute right-2 top-2 text-2xl text-gray-400 hover:text-white">×</button>
+			)}
 			{/* TRANSACTION */}
 			<div className='flex flex-wrap'>
 				<div className='w-full'>
@@ -68,6 +88,8 @@ const TransactionForm = () => {
 						type='text'
 						required
 						placeholder='Rent, Groceries, Salary, etc.'
+						value={formState.description}
+						onChange={handleChange}
 					/>
 				</div>
 			</div>
@@ -87,6 +109,8 @@ const TransactionForm = () => {
 							id='transactionType'
 							name='transactionType'
 							required
+							value={formState.transactionType}
+							onChange={handleChange}
 						>
 							<option value="">Select transaction type</option>
 							<option value="income">Income</option>
@@ -120,6 +144,8 @@ const TransactionForm = () => {
 							id='paymentType'
 							name='paymentType'
 							required
+							value={formState.paymentType}
+							onChange={handleChange}
 						>
 							<option value="">Select payment type</option>
 							<option value="card">Card</option>
@@ -151,6 +177,8 @@ const TransactionForm = () => {
 							id='category'
 							name='category'
 							required
+							value={formState.category}
+							onChange={handleChange}
 						>
 							<option value="">Select category</option>
 							<option value="saving">Saving</option>
@@ -183,6 +211,8 @@ const TransactionForm = () => {
 						min="0.01"
 						step="0.01"
 						placeholder='150'
+						value={formState.amount}
+						onChange={handleChange}
 					/>
 				</div>
 			</div>
@@ -202,6 +232,8 @@ const TransactionForm = () => {
 						name='location'
 						type='text'
 						placeholder='New York'
+						value={formState.location}
+						onChange={handleChange}
 					/>
 				</div>
 
@@ -218,18 +250,18 @@ const TransactionForm = () => {
 						className='appearance-none block w-full bg-gray-200 text-gray-700 border  rounded py-[11px] px-4 mb-3 leading-tight focus:outline-none
 						 focus:bg-white'
 						placeholder='Select date'
+						value={formState.date}
+						onChange={handleChange}
 					/>
 				</div>
 			</div>
 			{/* SUBMIT BUTTON */}
 			<button
-				className='text-white font-bold w-full rounded px-4 py-2 bg-gradient-to-br
-          from-pink-500 to-pink-500 hover:from-pink-600 hover:to-pink-600
-						disabled:opacity-70 disabled:cursor-not-allowed'
+				className='text-white font-bold w-full rounded px-4 py-2 bg-gradient-to-br from-[#23272f] to-[#23272f] hover:from-gray-700 hover:to-gray-700 disabled:opacity-70 disabled:cursor-not-allowed'
 				type='submit'
-				disabled={loading}
+				disabled={creating || updating}
 			>
-				{loading ? "Loading..." : "Add Transaction"}
+				{mode === "edit" ? (updating ? "Updating..." : "Update Transaction") : (creating ? "Loading..." : "Add Transaction")}
 			</button>
 		</form>
 	);
