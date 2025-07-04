@@ -4,6 +4,8 @@ import { GET_TRANSACTIONS } from "../graphql/queries/transaction.query.js";
 import { formatDate } from "../utils/formatDate.js";
 import TransactionForm from './TransactionForm';
 import { DELETE_TRANSACTION } from '../graphql/mutations/transaction.mutation.js';
+import toast from "react-hot-toast";
+import { useRefetchAllStats } from "../hooks/useRefetchAllStats";
 
 interface Transaction {
   _id: string;
@@ -18,7 +20,8 @@ interface Transaction {
 
 const RecentTransactions = () => {
   const { data, loading, error, refetch } = useQuery(GET_TRANSACTIONS);
-  const [deleteTransaction] = useMutation(DELETE_TRANSACTION, { onCompleted: () => refetch() });
+  const refetchAllStats = useRefetchAllStats();
+  const [deleteTransaction] = useMutation(DELETE_TRANSACTION, { refetchQueries: refetchAllStats });
   const [selectedTxn, setSelectedTxn] = React.useState<Transaction | null>(null);
   const [showOptionsId, setShowOptionsId] = React.useState<string | null>(null);
   const [showEditModal, setShowEditModal] = React.useState(false);
@@ -64,6 +67,7 @@ const RecentTransactions = () => {
 
   const handleDelete = async (txnId: string) => {
     await deleteTransaction({ variables: { transactionId: txnId } });
+    toast.success("Transaction deleted successfully");
     setShowOptionsId(null);
   };
 

@@ -2,6 +2,7 @@ import React from "react";
 import { useMutation } from "@apollo/client";
 import { CREATE_TRANSACTION, UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation.js";
 import toast from "react-hot-toast";
+import { useRefetchAllStats } from "../hooks/useRefetchAllStats";
 
 interface TransactionFormProps {
 	initialValues?: {
@@ -29,8 +30,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ initialValues, mode =
 		date: initialValues?.date || "",
 	});
 
-	const [createTransaction, { loading: creating }] = useMutation(CREATE_TRANSACTION, {refetchQueries: ["GetTransactions"]});
-	const [updateTransaction, { loading: updating }] = useMutation(UPDATE_TRANSACTION, {refetchQueries: ["GetTransactions"]});
+	const refetchAllStats = useRefetchAllStats();
+	const [createTransaction, { loading: creating }] = useMutation(CREATE_TRANSACTION, {refetchQueries: refetchAllStats});
+	const [updateTransaction, { loading: updating }] = useMutation(UPDATE_TRANSACTION, {refetchQueries: refetchAllStats});
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -182,8 +184,13 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ initialValues, mode =
 						>
 							<option value="">Select category</option>
 							<option value="saving">Saving</option>
-							<option value="expense">Expense</option>
 							<option value="investment">Investment</option>
+							<option value="bills">Bills</option>
+							<option value="clothing">Clothing</option>
+							<option value="rent">Rent</option>
+							<option value="housing">Housing</option>
+							<option value="food">Food</option>
+							<option value="recreation">Recreation</option>
 						</select>
 						<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 							<svg

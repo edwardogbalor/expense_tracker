@@ -1,5 +1,5 @@
 import React from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useApolloClient } from "@apollo/client";
 import { toast } from "react-hot-toast";
 import { LOGOUT } from "../graphql/mutations/user.mutation";
 import LineChart from "../components/LineChartData";
@@ -8,6 +8,7 @@ import { GET_TOTAL_BALANCE } from "../graphql/queries/statistics.query.js";
 import RecentTransactions from "../components/RecentTransactions";
 import { GET_REMAINING_BUDGET, GET_MONTH_TO_DATE, GET_NET_WORTH } from "../graphql/queries/transaction.query.js";
 import PieChart from "../components/PieChart";
+import { useRefetchAllStats } from "../hooks/useRefetchAllStats";
 
 const HomePage = () => {
 	const { data: balanceData, loading: balanceLoading, error: balanceError } = useQuery(GET_TOTAL_BALANCE);
@@ -15,8 +16,20 @@ const HomePage = () => {
 	const { data: mtdData, loading: mtdLoading, error: mtdError } = useQuery(GET_MONTH_TO_DATE);
 	const { data: netWorthData, loading: netWorthLoading, error: netWorthError } = useQuery(GET_NET_WORTH);
 	const [logout, { loading, client }] = useMutation(LOGOUT, { refetchQueries: ["GetAuthenticatedUser"] });
+	const refetchAllStats = useRefetchAllStats();
 
 	if (balanceError) console.error("Balance query error:", balanceError);
+
+	const handleFocus = () => {
+		refetchAllStats.forEach(query => {
+			client.refetchQueries({ include: [query] });
+		});
+	};
+
+	React.useEffect(() => {
+		window.addEventListener("focus", handleFocus);
+		return () => window.removeEventListener("focus", handleFocus);
+	}, [client, refetchAllStats]);
 
 	return (
 		<div className="w-full h-full flex flex-col gap-6">
